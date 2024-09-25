@@ -1,0 +1,30 @@
+org: sachinn
+service: api-to-s3-service
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  deploymentBucket:
+    name: workharu-serverless-deployment-ap-south-1
+    serverSideEncryption: AES256
+  environment:
+    API_URL: https://v2.jokeapi.dev/joke/Any
+    S3_BUCKET_NAME: workharu-serverless-deployment-ap-south-1
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource:
+        - arn:aws:s3:::workharu-serverless-deployment-ap-south-1/*
+        - arn:aws:s3:::workharu-serverless-deployment-ap-south-1/api-data-*.json
+
+functions:
+  fetchAndStoreData:
+    handler: index.fetchDataAndUploadToS3
+    events:
+      # - schedule: rate(1 minute)
+
+plugins:
+  - serverless-offline
